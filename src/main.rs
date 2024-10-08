@@ -266,12 +266,12 @@ fn bbs_generate_bytes(p: BigUint, q: BigUint, n: usize) -> Vec<u8> {
 fn main() {
     let mut rng = rand::thread_rng();
     
-    println!("\nBuilt-in cryptographic generator (bits):");
+    println!("\nBuilt-in generator (bits):");
     let mut os_rng = OsRng;
     let safe_bits_seq: Vec<u8> = (0..N).map(|_| os_rng.gen_range(0..2)).collect();
     test(&bits_to_bytes(&safe_bits_seq), 8);
     
-    println!("\nBuilt-in cryptographic generator (bytes):");
+    println!("\nBuilt-in generator (bytes):");
     let safe_bytes_seq: Vec<u8> = (0..N).map(|_| os_rng.gen()).collect();
     test(&safe_bytes_seq, 8);
 
