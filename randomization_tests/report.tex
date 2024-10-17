@@ -1,0 +1,89 @@
+\documentclass[12pt]{article}
+\usepackage[english,ukrainian]{babel}
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage{amsmath, booktabs, xcolor, hyperref}
+
+\title{\textbf{Аналіз генераторів псевдовипадкових послідовностей}}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Мета роботи}
+Вивчення критеріїв згоди і набуття навичок у побудові та застосуванні тестів для перевірки статистичних властивостей бінарних випадкових і псевдовипадкових послідовностей, ознайомлення з поняттям М-послідовності.
+
+\section{Теоретичні відомості}
+У роботі розглядаються наступні генератори:
+\begin{itemize}
+\item Вбудований генератор Rust
+\item Генератор Лемера
+\item L20 та L89 генератори
+\item Генератор Джеффі
+\item Генератор Вольфрама
+\item BM генератор
+\item BBS генератор
+\end{itemize}
+
+Для оцінки якості генераторів використовуються три статистичні тести:
+\begin{itemize}
+\item Тест на рівномірність розподілу
+\item Тест на незалежність
+\item Тест на однорідність
+\end{itemize}
+
+\section{Практична частина}
+\subsection{Хід роботи}
+Для кожного генератора було згенеровано послідовність довжиною 1 000 000 байт. Тести проводились для трьох рівнів значущості: 0.01, 0.05 та 0.10.
+\newpage
+\subsection{Результати}
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{l*{9}{c}}
+\toprule
+\multirow{}{}{\textbf{Генератор}} & \multicolumn{3}{c}{\textbf{$\alpha = 0.01$}} & \multicolumn{3}{c}{\textbf{$\alpha = 0.05$}} & \multicolumn{3}{c}{\textbf{$\alpha = 0.10$}} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
+ & \textbf{U} & \textbf{I} & \textbf{H} & \textbf{U} & \textbf{I} & \textbf{H} & \textbf{U} & \textbf{I} & \textbf{H} \\
+\midrule
+Вбудований (біти)  & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} \\
+Вбудований (байти) & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} \\
+Лемер (низькі)     & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} \\
+Лемер (високі)     & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} \\
+L20 (1M біт)       & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} \\
+L20 (16M біт)      & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} \\
+L89                & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} \\
+Джеффі             & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} \\
+Вольфрам           & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{red}{-} & \textcolor{green}{+} \\
+Бібліотекар         & \textcolor{red}{-} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{red}{-} & \textcolor{green}{+} \\
+BM (біти)          & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} \\
+BM (байти)         & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} \\
+BBS (біти)         & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} \\
+BBS (байти)        & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} \\
+\bottomrule
+\end{tabular}
+\caption{Результати тестів (U - рівномірність, I - незалежність, H - однорідність)}
+\label{tab:results}
+\end{table}
+
+\subsection{Аналіз результатів}
+\begin{itemize}
+\item Вбудований генератор Rust показав хороші результати, особливо для бітових послідовностей.
+\item Генератор Лемера має проблеми з незалежністю для низьких бітів та рівномірністю для високих бітів.
+\item L20 та L89 генератори показали відмінні результати для всіх тестів.
+\item Генератор Джеффі має проблеми з незалежністю.
+\item Генератор Вольфрама показав найгірші результати, не пройшовши тести на рівномірність та незалежність при α=0.05α=0.05 та α=0.10α=0.10.
+\item BM та BBS генератори показали хороші результати, особливо для байтових послідовностей.
+\end{itemize}
+
+\section{Висновки}
+На основі проведених тестів можна зробити наступні висновки:
+\begin{enumerate}
+\item Найкращі результати показали L20, L89, BM (байти) та BBS генератори.
+\item Генератор Вольфрама та Бібліотекаря виявилия найменш надійним серед досліджених.
+\item Вбудований генератор Rust показав хороші результати і може бути рекомендований для загального використання.
+\end{enumerate}
+
+Ці результати демонструють важливість вибору відповідного генератора псевдовипадкових послідовностей залежно від конкретних вимог до якості та швидкодії в різних застосуваннях.
+
+\end{document}

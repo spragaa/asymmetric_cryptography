@@ -1,10 +1,10 @@
-use num_traits::Zero;
-use rand::Rng;
-use std::fs::File;
-use rand::rngs::OsRng;
-use num_traits::ToPrimitive;
 use num_bigint::{BigUint, RandBigInt};
+use num_traits::ToPrimitive;
+use num_traits::Zero;
+use rand::rngs::OsRng;
+use rand::Rng;
 use statrs::distribution::{ChiSquared, ContinuousCDF};
+use std::fs::File;
 use std::io::{self, Read};
 use std::time::Instant;
 
@@ -19,7 +19,7 @@ fn bits_to_bytes(seq: &[u8]) -> Vec<u8> {
 // checks if the bytes in the sequence are uniformly distributed
 fn uniformity_test(seq: &[u8], alpha: f64) {
     let n = seq.len();
-    
+
     // expected count for each byte
     let n_s = n as f64 / 2f64.powi(8);
 
@@ -33,10 +33,12 @@ fn uniformity_test(seq: &[u8], alpha: f64) {
 
     // chi-square stat: sum of ((observed - expected)^2 / expected) for each byte value
     let res: f64 = counts.iter().map(|&c| (c - n_s).powi(2) / n_s).sum();
-    
+
     // chi-square stat crit value :=(256- 1)
-    let val = ChiSquared::new((2u32.pow(8) - 1) as f64).unwrap().inverse_cdf(1.0 - alpha);
-    
+    let val = ChiSquared::new((2u32.pow(8) - 1) as f64)
+        .unwrap()
+        .inverse_cdf(1.0 - alpha);
+
     println!(
         "Uniformity test:   Passed = {:<7}   Statistic = {:<12.10}",
         res <= val,
@@ -47,7 +49,7 @@ fn uniformity_test(seq: &[u8], alpha: f64) {
 // checks if consecutive bytes in the sequence are independent
 fn independence_test(seq: &[u8], alpha: f64) {
     let n = seq.len();
-    
+
     // count occurrences of each pair of consecutive bytes
     let mut pair_counts = vec![vec![0f64; 2usize.pow(8)]; 2usize.pow(8)];
     for window in seq.windows(2) {
@@ -60,7 +62,8 @@ fn independence_test(seq: &[u8], alpha: f64) {
     let mut s = 0.0;
     for i in 0..2usize.pow(8) {
         for j in 0..2usize.pow(8) {
-            let d = pair_counts[i].iter().sum::<f64>() * pair_counts.iter().map(|row| row[j]).sum::<f64>();
+            let d = pair_counts[i].iter().sum::<f64>()
+                * pair_counts.iter().map(|row| row[j]).sum::<f64>();
             if d != 0.0 {
                 s += pair_counts[i][j].powi(2) / d;
             }
@@ -68,9 +71,11 @@ fn independence_test(seq: &[u8], alpha: f64) {
     }
 
     let res = (n as f64) * (s - 1.0);
-    
+
     // chi-square stat crit value := (256 - 1)^2 = 65025
-    let val = ChiSquared::new(((2u32.pow(8) - 1).pow(2)) as f64).unwrap().inverse_cdf(1.0 - alpha);
+    let val = ChiSquared::new(((2u32.pow(8) - 1).pow(2)) as f64)
+        .unwrap()
+        .inverse_cdf(1.0 - alpha);
 
     println!(
         "Independence test: Passed = {:<7}   Statistic = {:<12.10}",
@@ -85,7 +90,7 @@ fn independence_test(seq: &[u8], alpha: f64) {
 fn homogeneity_test(seq: &[u8], alpha: f64) {
     let n = seq.len();
     let r = 200;
-    
+
     // count occurrences of each byte value in each interval
     let mut interval_counts = vec![vec![0f64; 2usize.pow(8)]; r];
 
@@ -102,7 +107,8 @@ fn homogeneity_test(seq: &[u8], alpha: f64) {
     let mut s = 0.0;
     for i in 0..r {
         for j in 0..2usize.pow(8) {
-            let d = interval_counts[i].iter().sum::<f64>() * interval_counts.iter().map(|row| row[j]).sum::<f64>();
+            let d = interval_counts[i].iter().sum::<f64>()
+                * interval_counts.iter().map(|row| row[j]).sum::<f64>();
             if d != 0.0 {
                 s += interval_counts[i][j].powi(2) / d;
             }
@@ -110,10 +116,12 @@ fn homogeneity_test(seq: &[u8], alpha: f64) {
     }
 
     let res = (n as f64) * (s - 1.0);
-    
+
     // chi-square stat crit value := (256 - 1) * (r - 1)
-    let val = ChiSquared::new(((2u32.pow(8) - 1) * (r as u32 - 1)) as f64).unwrap().inverse_cdf(1.0 - alpha);
-    
+    let val = ChiSquared::new(((2u32.pow(8) - 1) * (r as u32 - 1)) as f64)
+        .unwrap()
+        .inverse_cdf(1.0 - alpha);
+
     println!(
         "Homogeneity test:  Passed = {:<7}   Statistic = {:<12.10}",
         res <= val,
@@ -182,7 +190,7 @@ fn geffe_generate_bits(mut x: Vec<u8>, mut y: Vec<u8>, mut s: Vec<u8>, n: usize)
 
     for i in 0..n {
         seq[i] = (s[0] & x[0]) ^ ((!s[0]) & y[0]);
-        
+
         x[0] ^= x[2];
         x.rotate_right(1);
         y[0] ^= y[1] ^ y[3] ^ y[4];
@@ -293,12 +301,12 @@ fn run_tests_for_alphas() {
 
 fn main_with_alpha(alpha: f64) {
     let mut rng = rand::thread_rng();
-    
+
     println!("\nBuilt-in generator (bits):");
     let mut os_rng = OsRng;
     let safe_bits_seq: Vec<u8> = (0..N).map(|_| os_rng.gen_range(0..2)).collect();
     test(&bits_to_bytes(&safe_bits_seq), alpha);
-    
+
     println!("\nBuilt-in generator (bytes):");
     let safe_bytes_seq: Vec<u8> = (0..N).map(|_| os_rng.gen()).collect();
     test(&safe_bytes_seq, alpha);
@@ -325,7 +333,7 @@ fn main_with_alpha(alpha: f64) {
     let duration = start.elapsed();
     println!("Generation time: {:.2?} seconds", duration);
     test(&bits_to_bytes(&seq), alpha);
-    
+
     println!("\nL20 generator (16M bits):");
     println!("Initial state: {:?}", x_init);
     let start = Instant::now();
@@ -355,7 +363,7 @@ fn main_with_alpha(alpha: f64) {
     let duration = start.elapsed();
     println!("Generation time: {:.2?} seconds", duration);
     test(&bits_to_bytes(&seq), alpha);
-    
+
     println!("\nWolfram generator:");
     let start = Instant::now();
     let seq = wolfram_generate_bits(1, N);
@@ -364,15 +372,23 @@ fn main_with_alpha(alpha: f64) {
     test(&bits_to_bytes(&seq), alpha);
 
     println!("\nBM generator (bits):");
-    let p = BigUint::parse_bytes(b"CEA42B987C44FA642D80AD9F51F10457690DEF10C83D0BC1BCEE12FC3B6093E3", 16).unwrap();
-    let a = BigUint::parse_bytes(b"5B88C41246790891C095E2878880342E88C79974303BD0400B090FE38A688356", 16).unwrap();
+    let p = BigUint::parse_bytes(
+        b"CEA42B987C44FA642D80AD9F51F10457690DEF10C83D0BC1BCEE12FC3B6093E3",
+        16,
+    )
+    .unwrap();
+    let a = BigUint::parse_bytes(
+        b"5B88C41246790891C095E2878880342E88C79974303BD0400B090FE38A688356",
+        16,
+    )
+    .unwrap();
     let start = Instant::now();
     let seq = bm_generate_bits(p.clone(), a.clone(), N);
     let duration = start.elapsed();
     println!("Generation time: {:.2?} seconds", duration);
     test(&bits_to_bytes(&seq), alpha);
 
-    let filename = "/home/logi/myself/uni/TERM7/asym_crypto/asymmetric_cryptography/librarian.txt";
+    let filename = "/home/logi/myself/uni/TERM7/asym_crypto/asymmetric_cryptography/randomization_tests/librarian.txt";
     println!("\nLibrarian generator:");
     let start = Instant::now();
     if let Ok(bytes) = librarian_generate_bytes(filename, N) {
@@ -382,7 +398,7 @@ fn main_with_alpha(alpha: f64) {
     } else {
         println!("Failed to open text/librarian.txt");
     }
-    
+
     println!("\nBM generator (bytes):");
     let start = Instant::now();
     let seq = bm_generate_bytes(p, a, N);
