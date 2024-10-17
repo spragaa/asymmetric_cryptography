@@ -16,10 +16,14 @@ fn bits_to_bytes(seq: &[u8]) -> Vec<u8> {
         .collect()
 }
 
+// checks if the bytes in the sequence are uniformly distributed
 fn uniformity_test(seq: &[u8], alpha: f64) {
     let n = seq.len();
+    
+    // expected count for each byte
     let n_s = n as f64 / 2f64.powi(8);
 
+    // count occurrences of each byte value
     let mut counts = vec![0f64; 2usize.pow(8)];
     for &a in seq {
         if (a as usize) < counts.len() {
@@ -27,8 +31,12 @@ fn uniformity_test(seq: &[u8], alpha: f64) {
         }
     }
 
+    // chi-square stat: sum of ((observed - expected)^2 / expected) for each byte value
     let res: f64 = counts.iter().map(|&c| (c - n_s).powi(2) / n_s).sum();
+    
+    // chi-square stat crit value :=(256- 1)
     let val = ChiSquared::new((2u32.pow(8) - 1) as f64).unwrap().inverse_cdf(1.0 - alpha);
+    
     println!(
         "Uniformity test:   Passed = {:<7}   Statistic = {:<12.10}",
         res <= val,
@@ -36,8 +44,11 @@ fn uniformity_test(seq: &[u8], alpha: f64) {
     );
 }
 
+// checks if consecutive bytes in the sequence are independent
 fn independence_test(seq: &[u8], alpha: f64) {
     let n = seq.len();
+    
+    // count occurrences of each pair of consecutive bytes
     let mut pair_counts = vec![vec![0f64; 2usize.pow(8)]; 2usize.pow(8)];
     for window in seq.windows(2) {
         if (window[0] as usize) < pair_counts.len() && (window[1] as usize) < pair_counts.len() {
@@ -45,6 +56,7 @@ fn independence_test(seq: &[u8], alpha: f64) {
         }
     }
 
+    // chi-square stat: sum of ((observed^2) / (row_sum * col_sum / n)) for each pair
     let mut s = 0.0;
     for i in 0..2usize.pow(8) {
         for j in 0..2usize.pow(8) {
@@ -56,6 +68,8 @@ fn independence_test(seq: &[u8], alpha: f64) {
     }
 
     let res = (n as f64) * (s - 1.0);
+    
+    // chi-square stat crit value := (256 - 1)^2 = 65025
     let val = ChiSquared::new(((2u32.pow(8) - 1).pow(2)) as f64).unwrap().inverse_cdf(1.0 - alpha);
 
     println!(
@@ -65,9 +79,14 @@ fn independence_test(seq: &[u8], alpha: f64) {
     );
 }
 
+// checks if the distribution of bytes is consistent across different parts of the sequence
+// divides the sequence into r intervals and uses a chi-square test to compare
+// the distribution of bytes across these intervals
 fn homogeneity_test(seq: &[u8], alpha: f64) {
     let n = seq.len();
     let r = 200;
+    
+    // count occurrences of each byte value in each interval
     let mut interval_counts = vec![vec![0f64; 2usize.pow(8)]; r];
 
     for i in 0..r {
@@ -79,6 +98,7 @@ fn homogeneity_test(seq: &[u8], alpha: f64) {
         }
     }
 
+    // chi-square stat: similar to independence test (but comparing intervals instead of consecutive bytes)
     let mut s = 0.0;
     for i in 0..r {
         for j in 0..2usize.pow(8) {
@@ -90,7 +110,10 @@ fn homogeneity_test(seq: &[u8], alpha: f64) {
     }
 
     let res = (n as f64) * (s - 1.0);
+    
+    // chi-square stat crit value := (256 - 1) * (r - 1)
     let val = ChiSquared::new(((2u32.pow(8) - 1) * (r as u32 - 1)) as f64).unwrap().inverse_cdf(1.0 - alpha);
+    
     println!(
         "Homogeneity test:  Passed = {:<7}   Statistic = {:<12.10}",
         res <= val,
@@ -148,7 +171,7 @@ fn l89_generate_bits(x_init: Vec<u8>, n: usize) -> Vec<u8> {
     seq[..89].copy_from_slice(&x_init); // first 89 are random
 
     for i in 89..n {
-        seq[i] = seq[i - 38] ^ seq[i - 89]; // use recurrent
+        seq[i] = seq[i - 38] ^ seq[i - 89]; // use recurrent seq
     }
 
     seq
@@ -212,8 +235,8 @@ fn bm_generate_bits(p: BigUint, a: BigUint, n: usize) -> Vec<u8> {
     let half_p = &p / 2u32;
 
     for i in 0..n {
-        seq[i] = if x < half_p { 0 } else { 1 };
-        x = a.modpow(&x, &p).into();
+        seq[i] = if x < half_p { 0 } else { 1 }; // 1 if T < (p-1) / 2, else 0
+        x = a.modpow(&x, &p).into(); // T_(i+1) = a^(T_i) modp, T_0 - random
     }
 
     seq
@@ -225,8 +248,8 @@ fn bm_generate_bytes(p: BigUint, a: BigUint, n: usize) -> Vec<u8> {
     let mut x = BigUint::from(rng.gen_range(0..p.to_u64().unwrap_or(u64::MAX)));
 
     for i in 0..n {
-        seq[i] = ((&x * BigUint::from(256u32)) / &p).to_u8().unwrap_or(0);
-        x = a.modpow(&x, &p).into();
+        seq[i] = ((&x * BigUint::from(256u32)) / &p).to_u8().unwrap_or(0); // 1 if T < (p-1) / 2, else 0
+        x = a.modpow(&x, &p).into(); // T_(i+1) = a^(T_i) modp, T_0 - random
     }
 
     seq
@@ -239,7 +262,7 @@ fn bbs_generate_bits(p: BigUint, q: BigUint, n: usize) -> Vec<u8> {
     let mut x = BigUint::from(rng.gen_range(2..n_val.to_u64().unwrap_or(u64::MAX)));
 
     for i in 0..n {
-        x = (&x * &x) % &n_val;
+        x = (&x * &x) % &n_val; // (prev x^2 mod n) mod 2 -> take last bit
         seq[i] = if &x % 2u32 == BigUint::zero() { 0 } else { 1 };
     }
 
@@ -253,7 +276,7 @@ fn bbs_generate_bytes(p: BigUint, q: BigUint, n: usize) -> Vec<u8> {
     let mut x = BigUint::from(rng.gen_range(2..n_val.to_u64().unwrap_or(u64::MAX)));
 
     for i in 0..n {
-        x = (&x * &x) % &n_val;
+        x = (&x * &x) % &n_val; // (prev x^2 mod n) mod 2 -> take last bit
         seq[i] = (&x % BigUint::from(256u32)).to_u8().unwrap_or(0);
     }
 
