@@ -89,7 +89,7 @@ fn independence_test(seq: &[u8], alpha: f64) {
 // the distribution of bytes across these intervals
 fn homogeneity_test(seq: &[u8], alpha: f64) {
     let n = seq.len();
-    let r = 200;
+    let r = 250;
 
     // count occurrences of each byte value in each interval
     let mut interval_counts = vec![vec![0f64; 2usize.pow(8)]; r];
