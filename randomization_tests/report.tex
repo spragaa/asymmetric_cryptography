@@ -49,7 +49,7 @@
 Вбудований (біти)  & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} \\
 Вбудований (байти) & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} \\
 Лемер (низькі)     & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} \\
-Лемер (високі)     & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} \\
+Лемер (високі)     & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} \\
 L20 (1M біт)       & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} \\
 L20 (16M біт)      & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} \\
 L89                & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{green}{+} & \textcolor{red}{-} & \textcolor{green}{+} & \textcolor{green}{+} \\
@@ -66,6 +66,90 @@ BBS (байти)        & \textcolor{green}{+} & \textcolor{green}{+} & \textcol
 \label{tab:results}
 \end{table}
 
+\section{Значення статистик}
+
+\subsection{Значення статистик для $\alpha = 0.01$}
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{l*{3}{c}}
+\toprule
+\textbf{Генератор} & \textbf{U} & \textbf{I} & \textbf{H} \\
+\midrule
+Вбудований (біти)  & 221.37 & 64432.64 & 62660.04 \\
+Вбудований (байти) & 239.28 & 64796.47 & 58548.00 \\
+Лемер (низькі)     & 0.0123 & 2550000.00 & 959.56 \\
+Лемер (високі)     & 27.07 & 63304.23 & 59227.07 \\
+L20 (1M біт)       & 240.16 & 57572.66 & 63236.65 \\
+L20 (16M біт)      & 12.95 & 2859.93 & 55952.54 \\
+L89                & 239.23 & 64737.19 & 63002.95 \\
+Джеффі             & 257.21 & 80365.19 & 62155.92 \\
+Вольфрам           & 309.35 & 81381.06 & 63682.43 \\
+BM (біти)          & 259.26 & 65312.66 & 63680.92 \\
+BM (байти)         & 221.85 & 65191.36 & 59403.55 \\
+BBS (біти)         & 246.22 & 64547.96 & 63137.08 \\
+BBS (байти)        & 264.93 & 64885.39 & 58738.91 \\
+\bottomrule
+\end{tabular}
+\caption{Значення статистик для генераторів при $\alpha = 0.01$}
+\label{tab:statistics_alpha_01}
+\end{table}
+
+\newpage
+\subsection{Значення статистик для $\alpha = 0.05$}
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{l*{3}{c}}
+\toprule
+\textbf{Генератор} & \textbf{U} & \textbf{I} & \textbf{H} \\
+\midrule
+Вбудований (біти)  & 244.08 & 65444.67 & 63079.25 \\
+Вбудований (байти) & 256.22 & 64420.84 & 59138.76 \\
+Лемер (низькі)     & 0.0123 & 2550000.00 & 959.56 \\
+Лемер (високі)     & 27.07 & 63304.23 & 59227.07 \\
+L20 (1M біт)       & 224.40 & 57615.74 & 62809.68 \\
+L20 (16M біт)      & 10.71 & 2866.93 & 56273.07 \\
+L89                & 206.78 & 65160.20 & 63324.13 \\
+Джеффі             & 251.96 & 80899.85 & 61608.33 \\
+Вольфрам           & 309.35 & 81381.06 & 63682.43 \\
+BM (біти)          & 258.58 & 64830.99 & 62489.01 \\
+BM (байти)         & 237.31 & 65369.33 & 57282.63 \\
+BBS (біти)         & 273.79 & 64917.10 & 63664.18 \\
+BBS (байти)        & 268.28 & 65380.38 & 59009.51 \\
+\bottomrule
+\end{tabular}
+\caption{Значення статистик для генераторів при $\alpha = 0.05$}
+\label{tab:statistics_alpha_05}
+\end{table}
+
+\subsection{Значення статистик для $\alpha = 0.10$}
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{l*{3}{c}}
+\toprule
+\textbf{Генератор} & \textbf{U} & \textbf{I} & \textbf{H} \\
+\midrule
+Вбудований (біти)  & 267.82 & 64656.59 & 63456.49 \\
+Вбудований (байти) & 246.06 & 65121.71 & 59667.63 \\
+Лемер (низькі)     & 0.0123 & 2550000.00 & 959.56 \\
+Лемер (високі)     & 27.07 & 63304.23 & 59227.07 \\
+L20 (1M біт)       & 215.20 & 57291.03 & 63294.49 \\
+L20 (16M біт)      & 10.82 & 2870.24 & 55772.82 \\
+L89                & 246.26 & 65281.42 & 62700.88 \\
+Джеффі             & 238.68 & 80678.48 & 61826.21 \\
+Вольфрам           & 309.35 & 81381.06 & 63682.43 \\
+BM (біти)          & 258.64 & 64583.78 & 62918.33 \\
+BM (байти)         & 261.51 & 65415.49 & 59968.80 \\
+BBS (біти)         & 255.20 & 64894.51 & 64034.86 \\
+BBS (байти)        & 246.69 & 65380.38 & 59009.51 \\
+\bottomrule
+\end{tabular}
+\caption{Значення статистик для генераторів при $\alpha = 0.10$}
+\label{tab:statistics_alpha_10}
+\end{table}
+
 \subsection{Аналіз результатів}
 \begin{itemize}
 \item Вбудований генератор Rust показав хороші результати, особливо для бітових послідовностей.
@@ -74,6 +158,8 @@ BBS (байти)        & \textcolor{green}{+} & \textcolor{green}{+} & \textcol
 \item Генератор Джеффі має проблеми з незалежністю.
 \item Генератор Вольфрама показав найгірші результати, не пройшовши тести на рівномірність та незалежність при α=0.05α=0.05 та α=0.10α=0.10.
 \item BM та BBS генератори показали хороші результати, особливо для байтових послідовностей.
+\item Генератори L20 (1M bit) та L20 (16M bit) проходять тест на рівноімовірність, хоча значення статистик суттєво відрізняються, для 16М біт це значення близько 10, для 1М воно близьке до 260, це пов'язано зі структурою побудови лінійного регістру зсуву
+\item Вбудований генератор мови Rust використовує OsRng для генерації випадкових бітів і байтів, беручи ентропію з джерел операційної системи.
 \end{itemize}
 
 \section{Висновки}

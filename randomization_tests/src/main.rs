@@ -143,7 +143,8 @@ fn lehmer_low_generate_bytes(n: usize) -> Vec<u8> {
     seq[0] = x0;
 
     for i in 0..(n - 1) {
-        seq[i + 1] = (a * seq[i] + c) % 256; // x_(n+1) = (a * x_n + c) mod m
+        // seq[i + 1] = (a * seq[i] + c) % 256; // x_(n+1) = (a * x_n + c) mod m
+        seq[i + 1] = (a * seq[i] + c); // x_(n+1) = (a * x_n + c) mod m
     }
 
     seq.into_iter().map(|x| x as u8).collect() // take low bits
@@ -157,10 +158,14 @@ fn lehmer_high_generate_bytes(n: usize) -> Vec<u8> {
     seq[0] = x0;
 
     for i in 0..(n - 1) {
-        seq[i + 1] = (a * seq[i] + c) >> 24; // same, but we take high bits
+        seq[i + 1] = (a * seq[i] + c); // same, but we take high bits
+        // seq[i + 1] = (a * seq[i] + c) >> 24; // same, but we take high bits
     }
 
-    seq.into_iter().map(|x| x as u8).collect()
+    // shift here 
+    // seq[i + 1] = (a * seq[i] + c) >> 24; // same, but we take high bits
+    
+    seq.into_iter().map(|x| (x >> 24) as u8).collect()
 }
 
 fn l20_generate_bits(x_init: Vec<u8>, n: usize) -> Vec<u8> {
