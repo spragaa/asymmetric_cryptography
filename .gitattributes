@@ -1,2 +1,9 @@
 *.rs linguist-detectable=true
+*.rs linguist-language=Rust
+
 *.tex linguist-detectable=false
+*.tex linguist-documentation=true
+*.tex linguist-vendored=true
+
+*.pdf linguist-documentation=true
+*.pdf linguist-vendored=true
