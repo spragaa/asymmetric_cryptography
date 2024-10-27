@@ -1,3 +1,2 @@
-/src/**/*.rs linguist-detectable=true
-
-/reports/**/*.tex linguist-detectable=false
+*.rs linguist-detectable=true
+*.tex linguist-detectable=false
