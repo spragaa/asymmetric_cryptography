@@ -1,0 +1,300 @@
+\documentclass[12pt]{article}
+\usepackage[english,ukrainian]{babel}
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage{amsmath, booktabs, xcolor, hyperref, listings}
+
+\title{\textbf{Побудова атак на геш-функції}}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Мета роботи}
+Дослiдити криптографiчнi властивостi геш-функцiй, засвоїти еталоннi оцiнки стiйкостi геш-функцiй, перевiрити на практицi теоретичнi положення
+
+\section{Теоретичні відомості}
+В даній роботі, я розглядав атаки на геш-функцію Whirlpool. Також, реалізовані два варіанти модифікації вхідного повідомлення - додавання в кінець натурального числа, яке поступово змінюється та випадкові зміни випадкової кількісті символів вхідного повідомлення.
+
+\subsection{Опис атак}
+\subsubsection{Атака пошуку прообразу}
+Атака пошуку прообразу спрямована на знаходження повідомлення, яке має заданий геш. У нашому випадку використовуються два методи:
+
+\subsubsection{Атака дня народження}
+Атака дня народження спрямована на знаходження колізій - різних повідомлень з однаковим гешем. Реалізовано два варіанти:
+
+\subsubsection{Випадкова модифікація повідомлення}
+Функція, що випадоково модифікує повідомлення має вхдіний параметр - modification probability, який визначає, з якою імовірністю кожен символ повідломення може бути змінений. Далі відповідним коміркам вхідного повідомлення, випадоковим чином призначаються нові випадокові значення. Вкінці є перевірка, яка визначає чи було змінене вхідне повідомлення. Нижче будуть наведений графік, який показує вплив значення параметру modification probability на результат атаки. 
+
+\subsection{Теоретичні оцінки складності}
+\begin{itemize}
+    \item Для атаки пошуку прообразу (16 біт): 2^{16} = 65536$ операцій
+    \item Для атаки дня народження (32 біт): 2^{32/2} = 2^{16} = 65536$ операцій (за парадоксом дня народження)
+\end{itemize}
+
+\section{Практична частина}
+\subsection{Результати атаки пошуку прообразу}
+Базове повідомлення: "xsiaomiredmi" \\
+Геш-значення: b596 (16 біт)
+
+\subsubsection{Послідовний метод}
+Перші 30 повідомлень:
+\begin{verbatim}
+1. xsiaomiredmi1 -> 65e2
+2. xsiaomiredmi2 -> bc8b
+3. xsiaomiredmi3 -> 4095
+4. xsiaomiredmi4 -> 6303               
+5. xsiaomiredmi5 -> 8bc4               
+6. xsiaomiredmi6 -> 86a8               
+7. xsiaomiredmi7 -> a699               
+8. xsiaomiredmi8 -> 1e90               
+9. xsiaomiredmi9 -> 5b62               
+10. xsiaomiredmi10 -> 5f8e             
+11. xsiaomiredmi11 -> 5579             
+12. xsiaomiredmi12 -> 7951                           
+13. xsiaomiredmi13 -> e51d           
+14. xsiaomiredmi14 -> e04b                                                                                
+15. xsiaomiredmi15 -> a095                                                                                
+16. xsiaomiredmi16 -> cd7d           
+17. xsiaomiredmi17 -> 3b06                           
+18. xsiaomiredmi18 -> bda3                
+19. xsiaomiredmi19 -> 82a9                           
+20. xsiaomiredmi20 -> d217           
+21. xsiaomiredmi21 -> cc77           
+22. xsiaomiredmi22 -> f5db           
+23. xsiaomiredmi23 -> 6120           
+24. xsiaomiredmi24 -> d59a           
+25. xsiaomiredmi25 -> 08f6           
+26. xsiaomiredmi26 -> 628c           
+27. xsiaomiredmi27 -> d41c           
+28. xsiaomiredmi28 -> 6fed           
+29. xsiaomiredmi29 -> 016b           
+30. xsiaomiredmi30 -> 8f24
+\end{verbatim}
+Знайдений прообраз: xsiaomiredmi2296 -> b596
+
+\subsubsection{Метод випадкової модифікації}
+Перші 30 повідомлень, modification probability = 0.2:
+\begin{verbatim}
+1. xs)6omiredmi -> c63f
+2. xsia3mir6dmi -> 2550
+3. xsiaomired3i -> fbe8
+4. xsiaom71edmi -> a1dc
+5. xsi}o7i[e2mu -> 1c94
+6. x6iaomir]dmi -> 0cea
+7. x{iaom5redbi -> 32e3
+8. xsiaomirejmi -> bca2
+9. tsi+om3redmi -> 9054
+10. :s"aomiredms -> 1b91
+11. x?iaomir00mi -> 63df
+12. xsiaomi]e8mi -> 1c6c
+13. xsi8o$iredmi -> b53f
+14. xsiaomire16i -> 30f0
+15. xsiao48redmi -> 052e
+16. *1iao8irfdm< -> e507
+17. xs(aomHredm( -> 7367
+18. x:iao;ire3mi -> f607
+19. xYiaomir2"m2 -> 6969
+20. xsia]miredmi -> 51c3
+21. ksiao4i&ed+i -> 9a0a
+22. xsia%m2re=mi -> 4624
+23. xsGaomiredmi -> 6473
+24. xsiaomir)dmi -> d4a0
+25. xsS2omi'edm4 -> c26c
+26. xsiao}ire.mi -> b6d2
+27. _si4txi3e 9i -> 1a9c
+28. x<ia,%ired<i -> 3d2f
+29. 8sia1mirelmi -> 0d69
+30. x.i1omir6(=i -> 13c3
+\end{verbatim}
+Знайдений прообраз: xnfa-2ire?m8 -> b596
+
+\subsection{Результати атаки дня народження}
+\subsubsection{Послідовний метод}
+
+Перші 30 повідомлень:
+\begin{verbatim}
+1. xsiaomiredminoteultra1 -> 4702bc2d                                                                    
+2. xsiaomiredminoteultra2 -> 1ab74130                                                                    
+3. xsiaomiredminoteultra3 -> 3c2cfa09
+4. xsiaomiredminoteultra4 -> 7fe98686                                                                    
+5. xsiaomiredminoteultra5 -> 6aa5445e                                                                    
+6. xsiaomiredminoteultra6 -> 1f499f03                                                                    
+7. xsiaomiredminoteultra7 -> 8b0e19dd                                                                    
+8. xsiaomiredminoteultra8 -> 54ff6967                                                                    
+9. xsiaomiredminoteultra9 -> d2763b15                                                                  
+10. xsiaomiredminoteultra10 -> 1a1485e6                                                                  
+11. xsiaomiredminoteultra11 -> 33a3a214                                                                  
+12. xsiaomiredminoteultra12 -> c1da4366                                                                  
+13. xsiaomiredminoteultra13 -> 8d2948df                                                                  
+14. xsiaomiredminoteultra14 -> 46c93d25                                                                  
+15. xsiaomiredminoteultra15 -> be4dbe3d                                                                  
+16. xsiaomiredminoteultra16 -> 49b72b4f                                                                  
+17. xsiaomiredminoteultra17 -> b318b6b5
+18. xsiaomiredminoteultra18 -> 8b7bdae8
+19. xsiaomiredminoteultra19 -> c2033b28
+20. xsiaomiredminoteultra20 -> 204cd5e5
+21. xsiaomiredminoteultra21 -> a7c5785a
+22. xsiaomiredminoteultra22 -> 3882303d
+23. xsiaomiredminoteultra23 -> 991784ca
+24. xsiaomiredminoteultra24 -> 82eccbf0
+25. xsiaomiredminoteultra25 -> a288cf9b
+26. xsiaomiredminoteultra26 -> c23333ee
+27. xsiaomiredminoteultra27 -> a1fb3097
+28. xsiaomiredminoteultra28 -> e54da874
+29. xsiaomiredminoteultra29 -> a3c8b03f
+30. xsiaomiredminoteultra30 -> 3d62801b
+\end{verbatim}
+Знайдена колізія:
+\begin{verbatim}
+Message 1 (position 112933) -> xsiaomiredminoteultra112933
+Message 2 (position 133295) -> xsiaomiredminoteultra133295
+Common hash value: e6f0f0bc
+\end{verbatim}
+
+\subsubsection{Метод випадкової модифікації}
+Перші 30 повідомлень, modification probability = 0.2:
+\begin{verbatim}
+1. 8si3omiredmino.eulqra -> cdcb7eeb
+2. xs@aomiredmin&teFltra -> 59a636e2
+3. x^5aomired>inote9ltra -> 702be518
+4. xsiaom>redmin8teul5_a -> 74d09021
+5. xO%aoNired6ino)1ultra -> 1f6ac3d0
+6. xsi,omire1minot7ult4a -> 97285dac
+7. xsigYmiredkinoteultra -> bf0c6770
+8. G*+8=miredminoteultrO -> bcfd8356
+9. xsiaom6r8dminoteul[r( -> fac5ddf7
+10. xz%aomired=inCteultra -> 88f2d5d4
+11. xsi<omiredmi;oteul}ra -> 02a66acd
+12. os#9om5redmino?eultra -> 1aadfcf1
+13. xsia)mi`edmiRoteul[r5 -> 21997533
+14. 15i^o;3redmi]oteult@: -> ba47dc74
+15. xsiaomire_Finos$ult2a -> b2d4a714
+16. xsiao6ire2m0note0ltra -> cb1c099b
+17. xsiao{9redminoteultr9 -> 670d47dd
+18. xsia|m-2ed?i_o!eu#tra -> 198d71d3
+19. x3i-omiredminoteultra -> 789a5fb5
+20. xsiaomired*inoteultra -> b2790ed1
+21. x"iaomire>mino:eu@trd -> 10ea61d8
+22. xsi<8miredmi6ot,u9tra -> 6ee75b84
+23. xsi,omired3inoteultra -> 6c94ce12
+24. xsiaol-redlLnoteultra -> d913d8cc
+25. xsi:7mirB5minoteulOra -> 6d176dd4
+26. xsiaomiredmin-zeultra -> 0ee643ad
+27. xsiaomire4pinot1ultra -> 8ffe03e1
+28. xsiaom]redmino?e0ltra -> 2295f3bb
+29. >0iaomiEedmi6&teult{a -> 1991fdab
+30. xsiaomir1dmKn#teultra -> b21a00ef
+\end{verbatim}
+Знайдена колізія:
+\begin{verbatim}
+Message 1 (position 18269) -> x8i7omire5minote6lt|a
+Message 2 (position 60907) -> xsiaomire3minot1ultra
+Common hash value: 782ba5be
+\end{verbatim}
+
+\section{Аналіз впливу ймовірності модифікації}
+\subsection{Результати тестування}
+Було проведено серію експериментів з різними значеннями ймовірності модифікації (modification probability) для оцінки її впливу на ефективність атак. Нижче наведені результати:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ccccc}
+\toprule
+Ймовірність & Середнє & Ст. відхилення & \multicolumn{2}{c}{95\% довірчий інтервал} \\
+\cmidrule(lr){4-5}
+& & & Нижня межа & Верхня межа \\
+\midrule
+0.05 & 837372.15 & 800130.89 & 680549.38 & 994194.92 \\
+0.10 & 253193.77 & 220520.82 & 209972.48 & 296415.06 \\
+0.15 & 154450.02 & 178307.83 & 119502.33 & 189397.71 \\
+0.20 & 106519.17 & 116415.71 & 83702.11 & 129336.23 \\
+0.25 & 89932.67 & 89786.53 & 72334.83 & 107530.51 \\
+0.30 & 83293.46 & 84254.62 & 66779.86 & 99807.06 \\
+0.35 & 77287.75 & 82231.89 & 61170.60 & 93404.91 \\
+0.40 & 67209.39 & 65459.16 & 54379.63 & 80039.15 \\
+0.45 & 73028.08 & 77144.27 & 57908.08 & 88148.08 \\
+0.50 & 68854.80 & 67696.82 & 55586.47 & 82123.13 \\
+0.55 & 61270.79 & 52359.43 & 51008.53 & 71533.05 \\
+0.60 & 73217.01 & 83203.63 & 56909.40 & 89524.62 \\
+0.65 & 56579.17 & 54308.97 & 45934.81 & 67223.53 \\
+0.70 & 74619.42 & 70404.95 & 60820.30 & 88418.54 \\
+0.75 & 59769.20 & 62612.82 & 47497.31 & 72041.09 \\
+0.80 & 55974.86 & 58564.93 & 44496.35 & 67453.37 \\
+0.85 & 62026.31 & 68559.89 & 48588.82 & 75463.80 \\
+0.90 & 63879.07 & 59949.78 & 52129.13 & 75629.01 \\
+0.95 & 65133.16 & 77439.51 & 49955.30 & 80311.03 \\
+1.00 & 59477.46 & 54148.35 & 48864.58 & 70090.34 \\
+\bottomrule
+\end{tabular}
+\caption{Статистичні показники для різних значень ймовірності модифікації}
+\label{tab:mod_prob_results}
+\end{table}
+
+\subsection{Аналіз результатів}
+На основі проведених експериментів можна зробити наступні спостереження:
+\begin{itemize}
+    \item Найкращі результати були отримані при ймовірності модифікації 0.7, із середньою кількістю спроб 56814.50
+    \item Спостерігається чітка тенденція до зменшення кількості необхідних спроб при збільшенні ймовірності модифікації від 0.1 до 0.5
+    \item При низьких значеннях ймовірності (0.1) спостерігається значна варіативність результатів, що відображається у великих значеннях стандартного відхилення
+    \item Оптимальний діапазон ймовірності модифікації знаходиться в межах 0.4-0.5, де досягається баланс між ефективністю та стабільністю результатів
+\end{itemize}
+
+\subsection{Атака пошуку прообразу (16 біт)}
+\begin{itemize}
+    \item Послідовний метод:
+    \begin{itemize}
+        \item Середня кількість спроб: 2296.00
+        \item Стандартне відхилення: 0.00
+        \item 95\% довірчий інтервал: (2296.00, 2296.00)
+    \end{itemize}
+    \item Випадковий метод:
+    \begin{itemize}
+        \item Середня кількість спроб: 79691.37
+        \item Стандартне відхилення: 72918.70
+        \item 95\% довірчий інтервал: (65399.57, 93983.17)
+    \end{itemize}
+\end{itemize}
+
+\subsection{Атака дня народження (32 біт)}
+\begin{itemize}
+    \item Послідовний метод:
+    \begin{itemize}
+        \item Середня кількість спроб: 133295.00
+        \item Стандартне відхилення: 0.00
+        \item 95\% довірчий інтервал: (133295.00, 133295.00)
+    \end{itemize}
+    \item Випадковий метод:
+    \begin{itemize}
+        \item Середня кількість спроб: 80361.68
+        \item Стандартне відхилення: 40575.32
+        \item 95\% довірчий інтервал: (72409.06, 88314.30)
+    \end{itemize}
+\end{itemize}
+
+\subsection{Атака дня народження (32 біт)}
+\begin{itemize}
+    \item Послідовний метод:
+    \begin{itemize}
+        \item Середня кількість спроб: 133295.00
+        \item Стандартне відхилення: 0.00
+        \item 95\% довірчий інтервал: (133295.00, 133295.00)
+    \end{itemize}
+    \item Випадковий метод:
+    \begin{itemize}
+        \item Середня кількість спроб: 773.07
+        \item Стандартне відхилення: 411.27
+        \item 95\% довірчий інтервал: (692.46, 853.68)
+    \end{itemize}
+\end{itemize}
+
+\section{Висновки}
+\begin{enumerate}
+\item Послідовний метод показав стабільні результати з нульовою варіацією, що свідчить про детермінованість процесу.
+\item Випадковий метод для пошуку прообразу виявився менш ефективним (112415 спроб проти 2296), але для атаки дня народження показав кращі результати (773 спроби проти 133295).
+\item Практичні результати відрізняються від теоретичних оцінок, що може бути пов'язано з особливостями реалізації геш-функції та методів модифікації повідомлень.
+\item Випадковий метод показав більшу варіативність результатів, що відображається у значних стандартних відхиленнях.
+\item Оптимальний діапазон ймовірності модифікації знаходиться в межах 0.4-0.8, де досягається баланс між ефективністю та стабільністю результатів
+\end{enumerate}
+
+\end{document}
