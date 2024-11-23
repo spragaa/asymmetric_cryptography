@@ -2,3 +2,4 @@ target
 temp
 *.pdf
 *.zip
+*.log

@@ -4,6 +4,8 @@ use std::sync::{Arc, Mutex};
 use whirlpool::{Whirlpool, Digest};
 use std::time::Instant;
 use rayon::prelude::*;
+use log::{info, warn};
+use env_logger;
 
 fn whirhash(input: &[u8], bits: usize) -> Vec<u8> {
     let mut hasher = Whirlpool::new();
@@ -50,11 +52,14 @@ fn generate_chain(start: Vec<u8>, length: usize, r_func: &RedundancyFunction, bi
 struct PrecomputationTable {
     pairs: Arc<HashMap<Vec<u8>, Vec<u8>>>,
     r_func: RedundancyFunction,
+    attempts: Arc<Mutex<usize>>,
 }
 
 impl PrecomputationTable {
     fn new(k: usize, l: usize, bits: usize) -> Self {
         let r_func = RedundancyFunction::new(bits);
+        let attempts = Arc::new(Mutex::new(0));
+    
         let pairs: HashMap<_, _> = (0..k)
             .into_par_iter()
             .map(|_| {
@@ -68,28 +73,34 @@ impl PrecomputationTable {
     
         PrecomputationTable { 
             pairs: Arc::new(pairs), 
-            r_func 
+            r_func,
+            attempts 
         }
     }
 }
 
 fn find_prototype(
-  tables: &[PrecomputationTable],
-  hash: &[u8],
-  l: usize,
-  bits: usize
-) -> Option<Vec<u8>> {
+    tables: &[PrecomputationTable],
+    hash: &[u8],
+    l: usize,
+    bits: usize
+) -> (Option<Vec<u8>>, usize) {
     let mut current = hash.to_vec();
+    let mut total_attempts = 0;
     
     for j in 0..l {
         for table in tables {
+            let mut attempts = table.attempts.lock().unwrap();
+            *attempts += 1;
+            total_attempts += 1;
+    
             if let Some(start) = table.pairs.get(&current) {
                 let mut x = start.clone();
                 for _ in 0..(l-j) {
                     let with_redundancy = table.r_func.apply(&x);
                     x = whirhash(&with_redundancy, bits);
                 }
-                return Some(x);
+                return (Some(x), total_attempts);
             }
         }
     
@@ -97,7 +108,7 @@ fn find_prototype(
         current = whirhash(&with_redundancy, bits);
     }
     
-    None
+    (None, total_attempts)
 }
 
 fn run_experiments(
@@ -105,19 +116,31 @@ fn run_experiments(
     n_experiments: usize,
     l: usize,
     bits: usize
-    ) -> usize {
+) -> usize {
     let success_count = Arc::new(Mutex::new(0usize));
     
-    (0..n_experiments).into_par_iter().for_each(|_| {
+    (0..n_experiments).into_par_iter().for_each(|i| {
         let mut rng = thread_rng();
         let mut random_input = vec![0u8; 32];
         rng.fill(&mut random_input[..]);
     
         let hash = whirhash(&random_input, bits);
     
-        if find_prototype(tables, &hash, l, bits).is_some() {
-            let mut count = success_count.lock().unwrap();
-            *count += 1;
+        info!("Experiment {}: Input message (256-bit): {:?}", i, random_input);
+        info!("Experiment {}: Hash value: {:?}", i, hash);
+    
+        let (prototype, attempts) = find_prototype(tables, &hash, l, bits);
+    
+        match prototype {
+            Some(p) => {
+                info!("Experiment {}: Found prototype: {:?}", i, p);
+                info!("Experiment {}: Number of attempts: {}", i, attempts);
+                let mut count = success_count.lock().unwrap();
+                *count += 1;
+            }
+            None => {
+                warn!("Experiment {}: No prototype found after {} attempts", i, attempts);
+            }
         }
     });
     
@@ -126,6 +149,8 @@ fn run_experiments(
 }
 
 fn main() {
+    env_logger::init();
+    
     let bits = 32;
     let k_values = vec![1 << 20, 1 << 22, 1 << 24];
     let l_values = vec![1 << 10, 1 << 11, 1 << 12];
