@@ -9,4 +9,4 @@ edition = "2021"
 num-bigint = { version = "0.4", features = ["rand"] }
 num-traits = "0.2"
 rand = "0.8"
-hex = "0.4"
+lazy_static = "1.4"
