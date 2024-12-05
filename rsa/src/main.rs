@@ -15,75 +15,91 @@ fn main() {
     let bit_size = 256;
     let miller_rabin_iterations = 10;
 
-    println!("Generating new RSA key pair...");
-    let user = RSA::new(bit_size, miller_rabin_iterations);
+    println!("Generating RSA key pairs for Alice and Bob...");
+    let alice = RSA::new(bit_size, miller_rabin_iterations);
+    let bob = RSA::new(bit_size, miller_rabin_iterations);
 
-    println!("USER KEY INFORMATION:");
+    print_separator();
+
+    println!("ALICE'S KEY INFORMATION:");
     println!("Public Exponent (E):");
-    println!("{:X}", user.public_key_e);
+    println!("{:X}", alice.public_key_e);
     println!("\nPublic Modulus (N):");
-    println!("{:X}", user.public_key_n);
+    println!("{:X}", alice.public_key_n);
     println!("\nPrivate Key (D):");
-    println!("{:X}", user.private_key_d);
+    println!("{:X}", alice.private_key_d);
 
     print_separator();
 
-    println!("SERVER PARAMETERS:");
-    let server_e = BigInt::from(65537);
-    let server_n = hex_to_bigint("95F964B34209E5616D806C33AE352C060EF68696FAD9692DCE59769937A8BDEF");
-    println!("Server Public Exponent (E): {:X}", server_e);
-    println!("Server Public Modulus (N): {:X}", server_n);
+    println!("BOB'S KEY INFORMATION:");
+    println!("Public Exponent (E):");
+    println!("{:X}", bob.public_key_e);
+    println!("\nPublic Modulus (N):");
+    println!("{:X}", bob.public_key_n);
+    println!("\nPrivate Key (D):");
+    println!("{:X}", bob.private_key_d);
 
     print_separator();
 
-    println!("MESSAGE ENCRYPTION TEST:");
-    let message = hex_to_bigint("deadbee");
-    println!("Original Message: {:X}", message);
+    println!("MESSAGE EXCHANGE TEST:");
+    let message = hex_to_bigint("48656C6C6F20426F6221"); // "hello bob"
+    println!("Alice's original message: {:X}", message);
 
-    let encrypted = user.encrypt(&message, &server_e, &server_n);
-    println!("Encrypted Message: {:X}", encrypted);
+    let encrypted = alice.encrypt(&message, &bob.public_key_e, &bob.public_key_n);
+    println!("Encrypted message from Alice to Bob: {:X}", encrypted);
+
+    let decrypted = bob.decrypt(&encrypted, &bob.private_key_d, &bob.public_key_n);
+    println!("Bob's decrypted message: {:X}", decrypted);
 
     print_separator();
 
-    println!("MESSAGE DECRYPTION TEST:");
-    let en_message = hex_to_bigint(
-        "24CD96D1884D15835F5F00327269159C0D02F7706095A3B49CFD46DA2E2B813CF08B48C1D665B6566C5C7554A6073634D0E53CEACFCDC811D6B65F936224EDEB"
-    );
-    let d = hex_to_bigint(
-        "230E6AB34F1C1B33CF989DF1363D279386E85730C0F236EF5EEAAB26948E92B81D013A31FB6140DEFA8D1E42355AFD411D865F8651665F3CCC32A8912ADA3C69"
-    );
-    let n = hex_to_bigint(
-        "4AED4E114C13F4CFD7A0EFBA09D23F34CF7352B88F6C97983081CA983AE2B2ACC4FF4DA3C93106F3606213CBFB2775F2B60D61AD18E20AB5E91A04075B57BD0F"
-    );
+    println!("SIGNED MESSAGE EXCHANGE TEST:");
+    let secret_message = hex_to_bigint("5365637265742066726F6D20416C69636521"); // "secret from aslice"
+    println!("Original secret message: {:X}", secret_message);
 
-    println!("Encrypted Message to Decrypt:");
-    println!("{:X}", en_message);
+    let signature = alice.sign_message(&secret_message, &alice.private_key_d, &alice.public_key_n);
+    println!("Alice's signature: {:X}", signature);
 
-    let decrypted = user.decrypt(&en_message, &d, &n);
-    println!("\nDecrypted Result:");
-    println!("{:X}", decrypted);
+    let encrypted_message = alice.encrypt(&secret_message, &bob.public_key_e, &bob.public_key_n);
+    let encrypted_signature = alice.encrypt(&signature, &bob.public_key_e, &bob.public_key_n);
+    println!("Encrypted message: {:X}", encrypted_message);
+    println!("Encrypted signature: {:X}", encrypted_signature);
+
+    let decrypted_message = bob.decrypt(&encrypted_message, &bob.private_key_d, &bob.public_key_n);
+    let decrypted_signature = bob.decrypt(&encrypted_signature, &bob.private_key_d, &bob.public_key_n);
+
+    println!("Bob's decrypted message: {:X}", decrypted_message);
+
+    let is_valid = bob.verify_signature(
+        &decrypted_message,
+        &decrypted_signature,
+        &alice.public_key_e,
+        &alice.public_key_n
+    );
+    println!("Signature verification: {}", if is_valid { "SUCCESS" } else { "FAILED" });
 
     print_separator();
 
     println!("KEY EXCHANGE TEST:");
-    let (sent_key, sent_signature) = user.send_key(&message, &server_e, &server_n);
-    println!("Sent Key:");
-    println!("{:X}", sent_key);
-    println!("\nSent Signature:");
-    println!("{:X}", sent_signature);
+    let session_key = hex_to_bigint("DEADBEEF");
+    println!("Original session key: {:X}", session_key);
 
-    print_separator();
-
-    println!("KEY VERIFICATION TEST:");
-    let encrypted_key = hex_to_bigint(
-        "2F19DDD59D2515499B575F360CCE70F25DAA96A759B98459975E805A58DADC83CBCDDAF08CE1E7A44B10492577E8CC1D965D82AC47E152889D4BC67A55A6AF7D"
-    );
-    let sign_key = hex_to_bigint(
-        "3106736A0FB968FD577C78034C32D5D871ADA9BA6F673C9BECF642ADED1A9856430A501FB22B591EDE52688892C4CC38C130BA01134E6A7EEC7705506A1C6130"
+    let (encrypted_key, encrypted_key_signature) = alice.send_key(
+        &session_key,
+        &bob.public_key_e,
+        &bob.public_key_n
     );
 
-    let rec_key = user.receive_key(&encrypted_key, &sign_key, &server_e, &server_n, &d, &n);
-    println!("Key Verification Result: {}", if rec_key { "SUCCESS" } else { "FAILED" });
+    let key_verified = bob.receive_key(
+        &encrypted_key,
+        &encrypted_key_signature,
+        &alice.public_key_e,
+        &alice.public_key_n,
+        &bob.private_key_d,
+        &bob.public_key_n
+    );
+
+    println!("Key exchange verification: {}", if key_verified { "SUCCESS" } else { "FAILED" });
 
     print_separator();
 }

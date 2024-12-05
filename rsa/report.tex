@@ -1,0 +1,117 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage[ukrainian]{babel}
+
+\title{\textbf{Реалiзацiя криптосистеми RSA}}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Вступ}
+RSA - це асиметрична криптосистема, що використовується для шифрування та цифрового підпису. Алгоритм базується на складності факторизації добутку двох великих простих чисел.
+
+\subsection{Основні компоненти}
+\begin{itemize}
+  \item Генерація ключів (публічного та приватного)
+  \item Шифрування повідомлень
+  \item Цифровий підпис
+  \item Обмін ключами
+\end{itemize}
+
+\subsection{Принципи RSA}
+RSA базується на наступних принципах:
+\begin{itemize}
+  \item Вибір двох великих простих чисел p і q
+  \item Обчислення модуля \(n = p * q\)
+  \item Обчислення функції Ейлера \(φ(n) = (p-1)(q-1)\)
+  \item Вибір відкритої експоненти e
+  \item Обчислення секретної експоненти d
+\end{itemize}
+
+\section{Приклад роботи}
+
+Використані параметри:
+\begin{itemize}
+  \item Розмір ключа: 256 біт
+  \item Значення публічної експоненти (E): 0x10001
+\end{itemize}
+
+\subsection{Ключі Аліси}
+\begin{verbatim}
+Публічна експонента (E):
+10001
+
+Публічний модуль (N):
+1BE32B781E2188EC9A83F61062AF5695535732EF2F628B9E25001C7FAE4A5B7B
+47EE78EC6FE22E9E450166297B51A2DE88109D0C9C682DCB4768AE89FADEDF49
+
+Приватний ключ (D):
+A9108E77A833A5E6C2D940EA155CE78C61B44315CC2FA23F1E118EB481EE48A8
+26AE77CCA86B5E18C76A643F045CDCD385B906E19E3906531BB3068553B801
+\end{verbatim}
+
+\subsection{Ключі Боба}
+\begin{verbatim}
+Публічна експонента (E):
+10001
+
+Публічний модуль (N):
+5CBDEFD0905EBFBE3DBB5F0C25629991DFA666732B97ED71FA2BA5AC71509633
+F81E709FE3C402F5B71072B331BA7A54A7CBC6409C37326623B23C716EFA3805
+
+Приватний ключ (D):
+2F16D1B95854838F18D116859845E42BC91F384DAA08CE2B5D16E45C167D1086
+54CAC09D634E31403107F44773567F3FB233DFD8AACF5474E6D8B667F4066E01
+\end{verbatim}
+
+\section{Тестування функціональності}
+
+\subsection{Обмін повідомленнями}
+\begin{verbatim}
+Оригінальне повідомлення: 48656C6C6F20426F6221
+Зашифроване повідомлення: 
+5692720C48935A47A2E1EF8AFE46138BDDA24D6540F9D6498D6ECF7B033DFF1A
+D12CB01FE943A141A95B187FB42B97DF0D57922891D9E748A02F43274083CAEE
+Розшифроване повідомлення: 48656C6C6F20426F6221
+\end{verbatim}
+
+\subsection{Тест цифрового підпису}
+\begin{verbatim}
+Секретне повідомлення: 
+5365637265742066726F6D20416C69636521
+
+Підпис Аліси:
+13E3F8DDB6640592B41FF233F3FC7A91871B47FEC7079117630AEC531516F53C
+09AD5F32E85095F1848B2251803FD3B7A0EAEAB921977301AB7CE6A0A05E59DE
+
+Зашифроване повідомлення:
+B6DB06EF2396F8CACC3303E0D026120079320BC972E3CFC98F357AC9BC711C7B
+179C21266C60544756F18A8E2578734FD1062A03C13E73B33F9C6CEDB2C675C
+
+Результат верифікації: Успішно
+\end{verbatim}
+
+\subsection{Обмін ключами}
+\begin{verbatim}
+Сесійний ключ: DEADBEEF
+Зашифрований ключ:
+1fc8242f1744d07e10b946065135e8f6890587e3b979f49cfc5bb8bc18be2a47
+ebb64ec6babdea0552ef3bb9bf2c16e9e4b065f03089dcbb5d96e5e80696ffb4
+
+Зашифрований підпис:
+3a31089c88ce4f6be4384759612aa882b4e824e1e2200a27b64f452c6efe82d3
+691cbd86d0a24526a20aeb5936a3c33d45ab6981cbb42aef1034b153ee811f21
+
+Результат обміну: Успішно
+\end{verbatim}
+
+\section{Висновок}
+Реалізована RSA криптосистема демонструє правильне  виконання основних криптографічних операцій, включаючи шифрування, цифровий підпис та обмін ключами.
+
+\end{document}
