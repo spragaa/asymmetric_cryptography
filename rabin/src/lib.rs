@@ -1,7 +1,5 @@
-use num_bigint::{BigInt, RandomBits};
+use num_bigint::{BigInt};
 use num_traits::{One, Zero};
-use rand::rngs::OsRng;
-use std::str::FromStr;
 use num_bigint::RandBigInt;
 use num_traits::Num;
 
@@ -64,6 +62,49 @@ impl Rabin {
         roots.sort();
         roots.dedup();
         roots
+    }
+    
+    pub fn sign_message(&self, message: &BigInt) -> BigInt {
+        let hash = (message * message) % &self.public_key_n;
+        let roots = self.decrypt(&hash);
+        roots.into_iter().min().unwrap_or_else(|| BigInt::zero())
+    }
+
+    pub fn verify_signature(&self, message: &BigInt, signature: &BigInt) -> bool {
+        let hash = (message * message) % &self.public_key_n;
+        let verification = (signature * signature) % &self.public_key_n;
+        hash == verification
+    }
+
+    pub fn send_key(&self, key: &BigInt, recipient_n: &BigInt) -> (BigInt, BigInt) {
+        let encrypted_key = (key * key) % recipient_n;
+        let signature = self.sign_message(key);
+        let encrypted_signature = (signature.clone() * signature) % recipient_n;
+
+        (encrypted_key, encrypted_signature)
+    }
+
+    pub fn receive_key(
+        &self,
+        encrypted_key: &BigInt,
+        encrypted_signature: &BigInt,
+        sender_n: &BigInt,
+    ) -> Option<BigInt> {
+        let possible_keys = self.decrypt(encrypted_key);
+        let possible_signatures = self.decrypt(encrypted_signature);
+
+        for key in &possible_keys {
+            for signature in &possible_signatures {
+                let verification = (signature * signature) % sender_n;
+                let hash = (key * key) % sender_n;
+
+                if verification == hash {
+                    return Some(key.clone());
+                }
+            }
+        }
+
+        None
     }
 }
 
@@ -189,26 +230,6 @@ fn miller_rabin_test(p: &BigInt, k: u32) -> bool {
     true
 }
 
-fn generate_random_prime(bit_size: u32, miller_rabin_iterations: u32) -> BigInt {
-    let mut candidate = bbs_bit(&Q, &P, &N, bit_size);
-    loop {
-        candidate += 2;
-        if &candidate % 2 == BigInt::zero() {
-            candidate += 1;
-        }
-
-        if !trial_division(&candidate) {
-            continue;
-        }
-
-        if miller_rabin_test(&candidate, miller_rabin_iterations) {
-            break;
-        }
-    }
-    
-    candidate
-}
-
 fn mod_pow(base: &BigInt, exponent: &BigInt, modulus: &BigInt) -> BigInt {
     let mut result = BigInt::one();
     let mut base = base.clone();
@@ -223,33 +244,6 @@ fn mod_pow(base: &BigInt, exponent: &BigInt, modulus: &BigInt) -> BigInt {
     }
     
     result
-}
-
-fn mod_inverse(a: &BigInt, m: &BigInt) -> Option<BigInt> {
-    let mut t = BigInt::zero();
-    let mut newt = BigInt::one();
-    let mut r = m.clone();
-    let mut newr = a.clone();
-
-    while newr != BigInt::zero() {
-        let quotient = &r / &newr;
-        let temp_t = t.clone();
-        t = newt.clone();
-        newt = temp_t - &quotient * &newt;
-        let temp_r = r.clone();
-        r = newr.clone();
-        newr = temp_r - &quotient * &newr;
-    }
-
-    if r > BigInt::one() {
-        return None;
-    }
-    
-    if t < BigInt::zero() {
-        t += m;
-    }
-    
-    Some(t)
 }
 
 fn gcd(a: &BigInt, b: &BigInt) -> BigInt {
