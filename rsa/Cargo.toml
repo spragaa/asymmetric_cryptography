@@ -10,3 +10,4 @@ num-bigint = { version = "0.4", features = ["rand"] }
 num-traits = "0.2"
 rand = "0.8"
 lazy_static = "1.4"
+clap = "2.33"  
