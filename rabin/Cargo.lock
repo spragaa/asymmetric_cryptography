@@ -105,6 +105,7 @@ version = "0.1.0"
 dependencies = [
  "lazy_static",
  "num-bigint",
+ "num-integer",
  "num-traits",
  "rand",
 ]
